@@ -3,10 +3,12 @@ package com.example.moviesapp.data.repository
 import com.example.moviesapp.data.model.api.*
 import com.example.moviesapp.domain.mapper.toDomain
 import com.example.moviesapp.domain.model.Movie
-import com.example.moviesapp.domain.model.MovieType
 import com.example.moviesapp.domain.repository.MovieRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class MovieRepositoryImpl : MovieRepository {
+@Singleton
+class MovieRepositoryImpl @Inject constructor() : MovieRepository {
 
  override fun getMovies(): List<Movie> = mockMovies.map { it.toDomain() }
 
@@ -170,4 +172,3 @@ class MovieRepositoryImpl : MovieRepository {
  )
  }
  }
-}
