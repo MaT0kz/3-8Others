@@ -1,8 +1,10 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.compose")
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0"
+ id("com.android.application")
+ id("org.jetbrains.kotlin.android")
+ id("org.jetbrains.kotlin.plugin.compose")
+ id("org.jetbrains.kotlin.plugin.serialization")
+ id("com.google.dagger.hilt.android")
+ id("com.google.devtools.ksp")
 }
 
 android {
@@ -74,10 +76,15 @@ dependencies {
     // ConstraintLayout for Compose
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 
-    // Kotlinx Serialization for JSON parsing
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+ // Kotlinx Serialization for JSON parsing
+ implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    
+ // Hilt for Dependency Injection
+ implementation("com.google.dagger:hilt-android:2.50")
+ ksp("com.google.dagger:hilt-android-compiler:2.50")
+ implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
-    // Debug
+ // Debug
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
