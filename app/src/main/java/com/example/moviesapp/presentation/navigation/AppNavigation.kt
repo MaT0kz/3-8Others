@@ -27,11 +27,11 @@ fun AppNavigation(
     ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Movies.route,
+            startDestination = Screen.Search.route,
             modifier = Modifier.padding(paddingValues)
         ) {
             composable(
-                route = Screen.Movies.route
+                route = Screen.Search.route
             ) {
                 MoviesScreen(
                     onMovieClick = { movieId ->
@@ -39,19 +39,13 @@ fun AppNavigation(
                     }
                 )
             }
-            
+
             composable(
                 route = Screen.Favorites.route
             ) {
                 FavoritesScreen()
             }
-            
-            composable(
-                route = Screen.Search.route
-            ) {
-                SearchScreen()
-            }
-            
+
             composable(
                 route = Screen.MovieDetails.route,
                 arguments = listOf(
@@ -102,7 +96,7 @@ private fun BottomNavigationBar(
                 selected = false,
                 onClick = {
                     navController.navigate(item.route) {
-                        popUpTo(Screen.Movies.route) {
+                        popUpTo(Screen.Search.route) {
                             saveState = true
                         }
                         launchSingleTop = true

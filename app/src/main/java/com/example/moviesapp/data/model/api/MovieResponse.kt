@@ -6,27 +6,25 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MovieResponse(
  val id: String,
- val type: String,
  @SerialName("primaryTitle")
- val title: String,
+ val title: String? = null,
  @SerialName("originalTitle")
  val originalTitle: String? = null,
  @SerialName("primaryImage")
  val image: ImageResponse? = null,
  @SerialName("startYear")
  val year: Int? = null,
- @SerialName("runtimeSeconds")
- val runtimeSeconds: Int? = null,
- val genres: List<String>? = null,
+ val type: String? = null,
  val rating: RatingResponse? = null,
+ val genres: List<String>? = null,
  val plot: String? = null,
  val directors: List<PersonResponse>? = null,
  val writers: List<PersonResponse>? = null,
  val stars: List<PersonResponse>? = null,
+ @SerialName("runtimeSeconds")
+ val runtimeSeconds: Int? = null,
  @SerialName("originCountries")
- val countries: List<CountryResponse>? = null,
- @SerialName("spokenLanguages")
- val languages: List<LanguageResponse>? = null
+ val countries: List<CountryResponse>? = null
 )
 
 @Serializable
@@ -39,35 +37,29 @@ data class ImageResponse(
 @Serializable
 data class RatingResponse(
  @SerialName("aggregateRating")
- val aggregateRating: Double,
+ val aggregateRating: Double? = null,
  @SerialName("voteCount")
- val voteCount: Int
+ val voteCount: Int? = null
 )
 
 @Serializable
 data class PersonResponse(
- val id: String,
+ val id: String? = null,
  @SerialName("displayName")
- val displayName: String,
+ val displayName: String? = null,
  @SerialName("primaryImage")
- val image: ImageResponse? = null,
- @SerialName("primaryProfessions")
- val professions: List<String>? = null
+ val image: ImageResponse? = null
 )
 
 @Serializable
 data class CountryResponse(
- val code: String,
- val name: String
-)
-
-@Serializable
-data class LanguageResponse(
- val code: String,
- val name: String
+ val code: String? = null,
+ val name: String? = null
 )
 
 @Serializable
 data class MovieSearchResponse(
- val titles: List<MovieResponse>
+ val results: List<MovieResponse>? = null,
+ val titles: List<MovieResponse>? = null,
+ val errorMessage: String? = null
 )
