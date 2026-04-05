@@ -5,12 +5,16 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
+import com.example.moviesapp.di.SettingsBadgeCache
 import com.example.moviesapp.presentation.details.MovieDetailsScreen
 import com.example.moviesapp.presentation.favorites.FavoritesScreen
 import com.example.moviesapp.presentation.movies.MoviesScreen
@@ -18,11 +22,15 @@ import com.example.moviesapp.presentation.search.SearchScreen
 
 @Composable
 fun AppNavigation(
-    navController: NavHostController
+    navController: NavHostController,
+    settingsBadgeCache: SettingsBadgeCache
 ) {
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(navController)
+            BottomNavigationBar(
+                navController = navController,
+                settingsBadgeCache = settingsBadgeCache
+            )
         }
     ) { paddingValues ->
         NavHost(
@@ -36,6 +44,21 @@ fun AppNavigation(
                 MoviesScreen(
                     onMovieClick = { movieId ->
                         navController.navigate(Screen.MovieDetails.createRoute(movieId))
+                    }
+                )
+            }
+
+            composable(
+                route = Screen.Settings.route
+            ) {
+                SearchScreen(
+                    onSettingsApplied = {
+                        navController.navigate(Screen.Search.route) {
+                            popUpTo(Screen.Search.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
                     }
                 )
             }
@@ -86,12 +109,29 @@ fun AppNavigation(
 
 @Composable
 private fun BottomNavigationBar(
-    navController: NavHostController
+    navController: NavHostController,
+    settingsBadgeCache: SettingsBadgeCache
 ) {
+    val hasSettings by settingsBadgeCache.hasSettings.collectAsState()
+
     NavigationBar {
         bottomNavItems.forEach { item ->
             NavigationBarItem(
-                icon = { Icon(item.icon, contentDescription = item.title) },
+                icon = { 
+                    if (item.route == Screen.Settings.route && hasSettings) {
+                        BadgedBox(
+                            badge = {
+                                Badge(
+                                    containerColor = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        ) {
+                            Icon(item.icon, contentDescription = item.title)
+                        }
+                    } else {
+                        Icon(item.icon, contentDescription = item.title)
+                    }
+                },
                 label = { Text(item.title) },
                 selected = false,
                 onClick = {

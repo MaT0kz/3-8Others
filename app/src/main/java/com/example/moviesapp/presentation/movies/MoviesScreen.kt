@@ -12,12 +12,9 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,37 +32,50 @@ fun MoviesScreen(
  viewModel: MoviesViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var searchQuery by rememberSaveable { mutableStateOf("star") }
+
+    // Обновляем данные при каждом появлении экрана
+    LaunchedEffect(Unit) {
+        viewModel.loadMoviesWithFilters()
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(
-            text = "Поиск",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        // Search bar
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
+        Row(
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Введите название") },
-            leadingIcon = {
-                Icon(Icons.Default.Search, contentDescription = "Поиск")
-            },
-            trailingIcon = {
-                IconButton(onClick = { viewModel.searchMovies(searchQuery) }) {
-                    Icon(Icons.Default.Search, contentDescription = "Искать")
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Поиск",
+                style = MaterialTheme.typography.headlineMedium
+            )
+            
+            IconButton(onClick = { viewModel.refresh() }) {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = "Обновить с учётом фильтров"
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Индикатор применённых фильтров
+        when (val state = uiState) {
+            is MoviesUiState.Success -> {
+                if (state.movies.isNotEmpty()) {
+                    Text(
+                        text = "Найдено: ${state.movies.size} фильмов",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
-            },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = { viewModel.searchMovies(searchQuery) })
-        )
+            }
+            else -> {}
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -85,10 +95,20 @@ fun MoviesScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "Фильмы не найдены",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Фильмы не найдены",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Попробуйте изменить параметры поиска или фильтры",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 } else {
                     LazyColumn(
@@ -187,7 +207,7 @@ fun MoviesScreen(
                             color = MaterialTheme.colorScheme.error
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = { viewModel.loadMovies(searchQuery) }) {
+                        Button(onClick = { viewModel.loadMoviesWithFilters() }) {
                             Icon(Icons.Default.Refresh, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("Повторить")

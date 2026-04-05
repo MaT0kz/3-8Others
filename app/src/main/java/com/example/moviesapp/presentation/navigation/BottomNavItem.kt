@@ -3,6 +3,7 @@ package com.example.moviesapp.presentation.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 
 data class BottomNavItem(
@@ -16,6 +17,11 @@ val bottomNavItems = listOf(
         route = Screen.Search.route,
         icon = Icons.Default.Search,
         title = "Поиск"
+    ),
+    BottomNavItem(
+        route = Screen.Settings.route,
+        icon = Icons.Default.Settings,
+        title = "Настройки"
     ),
     BottomNavItem(
         route = Screen.Favorites.route,

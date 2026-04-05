@@ -63,3 +63,50 @@ data class MovieSearchResponse(
  val titles: List<MovieResponse>? = null,
  val errorMessage: String? = null
 )
+
+// Response для нового /titles endpoint
+@Serializable
+data class TitleSearchResponse(
+ @SerialName("titles")
+ val data: List<TitleData>? = null,
+ val paging: PagingInfo? = null
+)
+
+@Serializable
+data class TitleData(
+ val id: String,
+ @SerialName("primaryTitle")
+ val title: String? = null,
+ @SerialName("originalTitle")
+ val originalTitle: String? = null,
+ @SerialName("primaryImage")
+ val image: ImageResponse? = null,
+ @SerialName("startYear")
+ val year: Int? = null,
+ val type: String? = null,
+ val rating: RatingResponse? = null,
+ val genres: List<String>? = null,
+ val plot: String? = null,
+ @SerialName("runtimeSeconds")
+ val runtimeSeconds: Int? = null,
+ @SerialName("originCountries")
+ val countries: List<String>? = null
+)
+
+@Serializable
+data class PlotData(
+ @SerialName("plotText")
+ val plotText: PlotTextData? = null
+)
+
+@Serializable
+data class PlotTextData(
+ val plainText: String? = null,
+ val htmlText: String? = null
+)
+
+@Serializable
+data class PagingInfo(
+ val nextPageToken: String? = null,
+ val previousPageToken: String? = null
+)

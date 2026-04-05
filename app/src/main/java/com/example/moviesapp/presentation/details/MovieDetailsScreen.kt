@@ -19,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -86,6 +87,7 @@ fun MovieDetailsScreen(
 
             is DetailsUiState.Success -> {
                 val movie = state.movie
+                val isFavorite = state.isFavorite
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -265,17 +267,25 @@ fun MovieDetailsScreen(
 
                         Spacer(modifier = Modifier.height(24.dp))
 
+                        // Кнопка избранного
                         Button(
-                            onClick = { },
-                            modifier = Modifier.fillMaxWidth()
+                            onClick = { viewModel.toggleFavorite() },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = if (isFavorite) {
+                                ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.error
+                                )
+                            } else {
+                                ButtonDefaults.buttonColors()
+                            }
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Favorite,
+                                imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                 contentDescription = null,
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Добавить в избранное")
+                            Text(if (isFavorite) "Удалить из избранного" else "Добавить в избранное")
                         }
                     }
                 }

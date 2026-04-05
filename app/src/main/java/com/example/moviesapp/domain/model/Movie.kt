@@ -21,5 +21,6 @@ data class Movie(
 enum class MovieType {
  MOVIE,
  TV_SERIES,
+ SHORT,
  UNKNOWN
 }

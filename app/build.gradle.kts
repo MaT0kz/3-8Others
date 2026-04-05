@@ -92,6 +92,14 @@ dependencies {
  ksp("com.google.dagger:hilt-android-compiler:2.50")
  implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
+ // Room for local database
+ implementation("androidx.room:room-runtime:2.6.1")
+ implementation("androidx.room:room-ktx:2.6.1")
+ ksp("androidx.room:room-compiler:2.6.1")
+
+ // DataStore for preferences
+ implementation("androidx.datastore:datastore-preferences:1.0.0")
+
  // Debug
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
