@@ -39,8 +39,8 @@ import com.example.moviesapp.presentation.details.DetailsUiState
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun MovieDetailsScreen(
- onBackClick: () -> Unit,
- viewModel: MovieDetailsViewModel = hiltViewModel()
+    onBackClick: () -> Unit,
+    viewModel: MovieDetailsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -186,12 +186,13 @@ fun MovieDetailsScreen(
                                 onClick = {},
                                 label = { Text(movie.type) }
                             )
-                            movie.countries.split(", ").filter { it.isNotBlank() }.forEach { country ->
-                                AssistChip(
-                                    onClick = {},
-                                    label = { Text(country) }
-                                )
-                            }
+                            movie.countries.split(", ").filter { it.isNotBlank() }
+                                .forEach { country ->
+                                    AssistChip(
+                                        onClick = {},
+                                        label = { Text(country) }
+                                    )
+                                }
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))

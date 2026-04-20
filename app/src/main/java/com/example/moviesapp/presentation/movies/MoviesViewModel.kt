@@ -15,47 +15,50 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class MoviesUiState {
- data object Loading : MoviesUiState()
- data class Success(val movies: List<MovieUi>) : MoviesUiState()
- data class Error(val message: String) : MoviesUiState()
+    data object Loading : MoviesUiState()
+    data class Success(val movies: List<MovieUi>) : MoviesUiState()
+    data class Error(val message: String) : MoviesUiState()
 }
 
 @HiltViewModel
 class MoviesViewModel @Inject constructor(
- private val getMoviesUseCase: GetMoviesUseCase
+    private val getMoviesUseCase: GetMoviesUseCase
 ) : ViewModel() {
 
- private val _uiState = MutableStateFlow<MoviesUiState>(MoviesUiState.Loading)
- val uiState: StateFlow<MoviesUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<MoviesUiState>(MoviesUiState.Loading)
+    val uiState: StateFlow<MoviesUiState> = _uiState.asStateFlow()
 
- init {
- loadMovies()
- }
+    init {
+        loadMovies()
+    }
 
- fun loadMovies(query: String = "star") {
- viewModelScope.launch {
- Log.d("MoviesViewModel", "Loading movies for query: $query")
- _uiState.value = MoviesUiState.Loading
- when (val result = getMoviesUseCase(query)) {
- is Result.Success -> {
- Log.d("MoviesViewModel", "Success: ${result.data.size} movies")
- _uiState.value = MoviesUiState.Success(result.data.map { it.toUi() })
- }
- is Result.Error -> {
- Log.e("MoviesViewModel", "Error: ${result.exception.message}")
- _uiState.value = MoviesUiState.Error(result.exception.message ?: "Unknown error")
- }
- is Result.Loading -> {
- _uiState.value = MoviesUiState.Loading
- }
- }
- }
- }
+    fun loadMovies(query: String = "star") {
+        viewModelScope.launch {
+            Log.d("MoviesViewModel", "Loading movies for query: $query")
+            _uiState.value = MoviesUiState.Loading
+            when (val result = getMoviesUseCase(query)) {
+                is Result.Success -> {
+                    Log.d("MoviesViewModel", "Success: ${result.data.size} movies")
+                    _uiState.value = MoviesUiState.Success(result.data.map { it.toUi() })
+                }
 
- fun searchMovies(query: String) {
- if (query.isNotBlank()) {
- Log.d("MoviesViewModel", "Searching: $query")
- loadMovies(query)
- }
- }
+                is Result.Error -> {
+                    Log.e("MoviesViewModel", "Error: ${result.exception.message}")
+                    _uiState.value =
+                        MoviesUiState.Error(result.exception.message ?: "Unknown error")
+                }
+
+                is Result.Loading -> {
+                    _uiState.value = MoviesUiState.Loading
+                }
+            }
+        }
+    }
+
+    fun searchMovies(query: String) {
+        if (query.isNotBlank()) {
+            Log.d("MoviesViewModel", "Searching: $query")
+            loadMovies(query)
+        }
+    }
 }

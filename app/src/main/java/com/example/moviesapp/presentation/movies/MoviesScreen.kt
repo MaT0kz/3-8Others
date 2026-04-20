@@ -31,8 +31,8 @@ import com.example.moviesapp.presentation.model.MovieUi
 
 @Composable
 fun MoviesScreen(
- onMovieClick: (String) -> Unit,
- viewModel: MoviesViewModel = hiltViewModel()
+    onMovieClick: (String) -> Unit,
+    viewModel: MoviesViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var searchQuery by rememberSaveable { mutableStateOf("star") }

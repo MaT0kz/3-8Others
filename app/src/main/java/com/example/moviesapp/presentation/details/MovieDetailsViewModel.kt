@@ -15,15 +15,15 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class DetailsUiState {
- data object Loading : DetailsUiState()
- data class Success(val movie: MovieUi) : DetailsUiState()
- data class Error(val message: String) : DetailsUiState()
+    data object Loading : DetailsUiState()
+    data class Success(val movie: MovieUi) : DetailsUiState()
+    data class Error(val message: String) : DetailsUiState()
 }
 
 @HiltViewModel
 class MovieDetailsViewModel @Inject constructor(
- private val getMovieByIdUseCase: GetMovieByIdUseCase,
- savedStateHandle: SavedStateHandle
+    private val getMovieByIdUseCase: GetMovieByIdUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<DetailsUiState>(DetailsUiState.Loading)

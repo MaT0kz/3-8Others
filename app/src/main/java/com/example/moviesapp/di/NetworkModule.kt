@@ -18,39 +18,39 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
- @Provides
- @Singleton
- fun provideOkHttpClient(): OkHttpClient {
- val loggingInterceptor = HttpLoggingInterceptor().apply {
- level = HttpLoggingInterceptor.Level.BODY
- }
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(): OkHttpClient {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
 
- return OkHttpClient.Builder()
- .addInterceptor(loggingInterceptor)
- .connectTimeout(30, TimeUnit.SECONDS)
- .readTimeout(30, TimeUnit.SECONDS)
- .writeTimeout(30, TimeUnit.SECONDS)
- .build()
- }
+        return OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
 
- @Provides
- @Singleton
- fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
- val json = Json {
- ignoreUnknownKeys = true
- isLenient = true
- }
+    @Provides
+    @Singleton
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        val json = Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+        }
 
- return Retrofit.Builder()
- .baseUrl(ApiService.BASE_URL)
- .client(okHttpClient)
- .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
- .build()
- }
+        return Retrofit.Builder()
+            .baseUrl(ApiService.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+    }
 
- @Provides
- @Singleton
- fun provideApiService(retrofit: Retrofit): ApiService {
- return retrofit.create(ApiService::class.java)
- }
+    @Provides
+    @Singleton
+    fun provideApiService(retrofit: Retrofit): ApiService {
+        return retrofit.create(ApiService::class.java)
+    }
 }

@@ -13,19 +13,19 @@ import javax.inject.Singleton
 
 @Singleton
 class MovieRepositoryImpl @Inject constructor(
- private val apiService: ApiService
+    private val apiService: ApiService
 ) : MovieRepository {
 
- override suspend fun searchMovies(query: String): List<Movie> {
- val response = apiService.searchMovies(query = query)
- Log.d("MovieRepository", "Response: $response")
- Log.d("MovieRepository", "Results: ${response.results}, Titles: ${response.titles}")
- val movies = response.results ?: response.titles
- return movies?.map { it.toDomain() } ?: emptyList()
- }
+    override suspend fun searchMovies(query: String): List<Movie> {
+        val response = apiService.searchMovies(query = query)
+        Log.d("MovieRepository", "Response: $response")
+        Log.d("MovieRepository", "Results: ${response.results}, Titles: ${response.titles}")
+        val movies = response.results ?: response.titles
+        return movies?.map { it.toDomain() } ?: emptyList()
+    }
 
- override suspend fun getMovieById(id: String): Movie? {
- val response = apiService.getMovieById(id)
- return response.toDomain()
- }
+    override suspend fun getMovieById(id: String): Movie? {
+        val response = apiService.getMovieById(id)
+        return response.toDomain()
+    }
 }
