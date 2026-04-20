@@ -25,16 +25,16 @@ fun FavoritesScreen() {
             modifier = Modifier.size(80.dp),
             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
         )
-        
+
         Spacer(modifier = Modifier.height(16.dp))
-        
+
         Text(
             text = "Избранное",
             style = MaterialTheme.typography.headlineMedium
         )
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         Text(
             text = "Здесь будут ваши любимые фильмы.\nФункционал будет добавлен в следующих практиках.",
             style = MaterialTheme.typography.bodyLarge,

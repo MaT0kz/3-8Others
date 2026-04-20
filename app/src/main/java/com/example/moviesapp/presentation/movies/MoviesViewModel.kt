@@ -14,19 +14,19 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MoviesViewModel @Inject constructor(
- private val repository: MovieRepository
+    private val repository: MovieRepository
 ) : ViewModel() {
 
- private val _movies = MutableStateFlow<List<MovieUi>>(emptyList())
- val movies: StateFlow<List<MovieUi>> = _movies.asStateFlow()
+    private val _movies = MutableStateFlow<List<MovieUi>>(emptyList())
+    val movies: StateFlow<List<MovieUi>> = _movies.asStateFlow()
 
- init {
- loadMovies()
- }
+    init {
+        loadMovies()
+    }
 
- private fun loadMovies() {
- viewModelScope.launch {
- _movies.value = repository.getMovies().map { it.toUi() }
- }
- }
+    private fun loadMovies() {
+        viewModelScope.launch {
+            _movies.value = repository.getMovies().map { it.toUi() }
+        }
+    }
 }

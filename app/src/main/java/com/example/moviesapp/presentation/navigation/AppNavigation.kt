@@ -39,19 +39,19 @@ fun AppNavigation(
                     }
                 )
             }
-            
+
             composable(
                 route = Screen.Favorites.route
             ) {
                 FavoritesScreen()
             }
-            
+
             composable(
                 route = Screen.Search.route
             ) {
                 SearchScreen()
             }
-            
+
             composable(
                 route = Screen.MovieDetails.route,
                 arguments = listOf(
