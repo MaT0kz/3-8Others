@@ -78,8 +78,6 @@ class ProfileViewModel @Inject constructor(
                         val statusIdx = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
                         when (cursor.getInt(statusIdx)) {
                             DownloadManager.STATUS_SUCCESSFUL -> {
-                                // getUriForDownloadedFile возвращает content:// URI,
-                                // безопасный для передачи другим приложениям (без FileUriExposedException)
                                 _downloadedFileUri.value = dm.getUriForDownloadedFile(downloadId)
                                 done = true
                             }

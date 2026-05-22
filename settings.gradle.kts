@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "MoviesApp"
 include(":app")
+include(":feature:profile")

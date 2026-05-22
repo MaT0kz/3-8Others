@@ -80,7 +80,6 @@ fun EditProfileScreen(
 
     var timeFieldValue by remember { mutableStateOf(TextFieldValue("")) }
 
-    // Синхронизируем поле с ViewModel при первой загрузке сохранённых данных
     LaunchedEffect(uiState.classTime) {
         if (timeFieldValue.text != uiState.classTime) {
             timeFieldValue = TextFieldValue(
@@ -107,7 +106,7 @@ fun EditProfileScreen(
 
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { /* no action needed if denied — alarm still fires, receiver checks */ }
+    ) { /* no action if denied — alarm still fires, receiver checks */ }
 
     val storagePermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -298,7 +297,6 @@ fun EditProfileScreen(
                         val digits = tfv.text.filter { it.isDigit() }.take(4)
                         val formatted = if (digits.length <= 2) digits
                                         else "${digits.take(2)}:${digits.drop(2)}"
-                        // Всегда ставим курсор в конец, чтобы он не застрял перед вставленным ":"
                         timeFieldValue = TextFieldValue(
                             text = formatted,
                             selection = TextRange(formatted.length)
