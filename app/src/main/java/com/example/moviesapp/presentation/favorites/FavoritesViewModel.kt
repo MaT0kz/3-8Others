@@ -12,34 +12,34 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class FavoritesUiState {
- data object Loading : FavoritesUiState()
- data class Success(val favorites: List<MovieUi>) : FavoritesUiState()
- data class Error(val message: String) : FavoritesUiState()
+    data object Loading : FavoritesUiState()
+    data class Success(val favorites: List<MovieUi>) : FavoritesUiState()
+    data class Error(val message: String) : FavoritesUiState()
 }
 
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
- private val favoritesRepository: FavoritesRepository
+    private val favoritesRepository: FavoritesRepository
 ) : ViewModel() {
 
- private val _uiState = MutableStateFlow<FavoritesUiState>(FavoritesUiState.Loading)
- val uiState: StateFlow<FavoritesUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<FavoritesUiState>(FavoritesUiState.Loading)
+    val uiState: StateFlow<FavoritesUiState> = _uiState.asStateFlow()
 
- init {
- loadFavorites()
- }
+    init {
+        loadFavorites()
+    }
 
- private fun loadFavorites() {
- viewModelScope.launch {
- favoritesRepository.getAllFavorites().collect { favorites ->
- _uiState.value = FavoritesUiState.Success(favorites)
- }
- }
- }
+    private fun loadFavorites() {
+        viewModelScope.launch {
+            favoritesRepository.getAllFavorites().collect { favorites ->
+                _uiState.value = FavoritesUiState.Success(favorites)
+            }
+        }
+    }
 
- fun removeFromFavorites(movieId: String) {
- viewModelScope.launch {
- favoritesRepository.removeFromFavorites(movieId)
- }
- }
+    fun removeFromFavorites(movieId: String) {
+        viewModelScope.launch {
+            favoritesRepository.removeFromFavorites(movieId)
+        }
+    }
 }

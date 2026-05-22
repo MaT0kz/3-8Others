@@ -42,8 +42,8 @@ class MainActivity : ComponentActivity() {
                     LaunchedEffect(Unit) {
                         val filters = settingsDataStore.filters.first()
                         val hasActiveSettings = filters.genre.isNotEmpty() ||
-                            filters.minRating > 0 ||
-                            filters.yearFrom.isNotEmpty()
+                                filters.minRating > 0 ||
+                                filters.yearFrom.isNotEmpty()
                         settingsBadgeCache.setHasSettings(hasActiveSettings)
                     }
 

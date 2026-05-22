@@ -16,16 +16,16 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class DetailsUiState {
- data object Loading : DetailsUiState()
- data class Success(val movie: MovieUi, val isFavorite: Boolean = false) : DetailsUiState()
- data class Error(val message: String) : DetailsUiState()
+    data object Loading : DetailsUiState()
+    data class Success(val movie: MovieUi, val isFavorite: Boolean = false) : DetailsUiState()
+    data class Error(val message: String) : DetailsUiState()
 }
 
 @HiltViewModel
 class MovieDetailsViewModel @Inject constructor(
- private val getMovieByIdUseCase: GetMovieByIdUseCase,
- private val favoritesRepository: FavoritesRepository,
- savedStateHandle: SavedStateHandle
+    private val getMovieByIdUseCase: GetMovieByIdUseCase,
+    private val favoritesRepository: FavoritesRepository,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<DetailsUiState>(DetailsUiState.Loading)
@@ -36,9 +36,9 @@ class MovieDetailsViewModel @Inject constructor(
 
     init {
         val movieId = savedStateHandle.get<String>("movieId")
-        movieId?.let { 
+        movieId?.let {
             currentMovieId = it
-            loadMovie(it) 
+            loadMovie(it)
         }
     }
 
@@ -49,10 +49,10 @@ class MovieDetailsViewModel @Inject constructor(
                 is Result.Success -> {
                     val movie = result.data.toUi()
                     currentMovie = movie
-                    
+
                     // Проверяем, есть ли в избранном
                     favoritesRepository.isFavorite(id).collect { isFavorite ->
-                        currentMovie?.let { 
+                        currentMovie?.let {
                             _uiState.value = DetailsUiState.Success(it, isFavorite)
                         }
                     }

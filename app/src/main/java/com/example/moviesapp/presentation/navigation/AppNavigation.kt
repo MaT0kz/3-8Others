@@ -2,18 +2,24 @@ package com.example.moviesapp.presentation.navigation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import androidx.navigation.NavType
 import com.example.moviesapp.di.SettingsBadgeCache
 import com.example.moviesapp.presentation.details.MovieDetailsScreen
 import com.example.moviesapp.presentation.favorites.FavoritesScreen
@@ -117,7 +123,7 @@ private fun BottomNavigationBar(
     NavigationBar {
         bottomNavItems.forEach { item ->
             NavigationBarItem(
-                icon = { 
+                icon = {
                     if (item.route == Screen.Settings.route && hasSettings) {
                         BadgedBox(
                             badge = {
