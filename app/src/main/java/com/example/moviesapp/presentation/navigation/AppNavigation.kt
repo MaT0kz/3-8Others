@@ -24,6 +24,8 @@ import com.example.moviesapp.di.SettingsBadgeCache
 import com.example.moviesapp.presentation.details.MovieDetailsScreen
 import com.example.moviesapp.presentation.favorites.FavoritesScreen
 import com.example.moviesapp.presentation.movies.MoviesScreen
+import com.example.moviesapp.presentation.profile.EditProfileScreen
+import com.example.moviesapp.presentation.profile.ProfileScreen
 import com.example.moviesapp.presentation.search.SearchScreen
 
 @Composable
@@ -73,6 +75,25 @@ fun AppNavigation(
                 route = Screen.Favorites.route
             ) {
                 FavoritesScreen()
+            }
+
+            composable(
+                route = Screen.Profile.route
+            ) {
+                ProfileScreen(
+                    onEditClick = {
+                        navController.navigate(Screen.EditProfile.route)
+                    }
+                )
+            }
+
+            composable(
+                route = Screen.EditProfile.route
+            ) {
+                EditProfileScreen(
+                    onDone = { navController.popBackStack() },
+                    onBackClick = { navController.popBackStack() }
+                )
             }
 
             composable(

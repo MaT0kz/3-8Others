@@ -2,6 +2,7 @@ package com.example.moviesapp.presentation.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -27,5 +28,10 @@ val bottomNavItems = listOf(
         route = Screen.Favorites.route,
         icon = Icons.Default.Favorite,
         title = "Избранное"
+    ),
+    BottomNavItem(
+        route = Screen.Profile.route,
+        icon = Icons.Default.Person,
+        title = "Профиль"
     )
 )
