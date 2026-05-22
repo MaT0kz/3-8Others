@@ -19,10 +19,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,8 +39,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -48,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -55,6 +64,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import java.io.File
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -68,7 +78,22 @@ fun EditProfileScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
+    var timeFieldValue by remember { mutableStateOf(TextFieldValue("")) }
+
+    // Синхронизируем поле с ViewModel при первой загрузке сохранённых данных
+    LaunchedEffect(uiState.classTime) {
+        if (timeFieldValue.text != uiState.classTime) {
+            timeFieldValue = TextFieldValue(
+                text = uiState.classTime,
+                selection = TextRange(uiState.classTime.length)
+            )
+        }
+    }
+
     var showPhotoSourceSheet by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
+    var timePickerHour by remember { mutableStateOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) }
+    var timePickerMinute by remember { mutableStateOf(Calendar.getInstance().get(Calendar.MINUTE)) }
     val bottomSheetState = rememberModalBottomSheetState()
 
     var cameraImageFile by remember { mutableStateOf<File?>(null) }
@@ -80,10 +105,21 @@ fun EditProfileScreen(
         Manifest.permission.READ_EXTERNAL_STORAGE
     }
 
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { /* no action needed if denied — alarm still fires, receiver checks */ }
+
     val storagePermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        if (!isGranted) onBackClick()
+        if (!isGranted) {
+            onBackClick()
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val hasNotif = ContextCompat.checkSelfPermission(
+                context, Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+            if (!hasNotif) notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
     }
 
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
@@ -108,8 +144,7 @@ fun EditProfileScreen(
         uri?.let {
             try {
                 context.contentResolver.takePersistableUriPermission(
-                    it,
-                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    it, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
             } catch (_: SecurityException) { }
             viewModel.updateAvatarUri(it.toString())
@@ -122,8 +157,7 @@ fun EditProfileScreen(
         uri?.let {
             try {
                 context.contentResolver.takePersistableUriPermission(
-                    it,
-                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    it, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
             } catch (_: SecurityException) { }
             viewModel.updateAvatarUri(it.toString())
@@ -131,11 +165,16 @@ fun EditProfileScreen(
     }
 
     LaunchedEffect(Unit) {
-        val hasPermission = ContextCompat.checkSelfPermission(
+        val hasStorage = ContextCompat.checkSelfPermission(
             context, storagePermission
         ) == PackageManager.PERMISSION_GRANTED
-        if (!hasPermission) {
+        if (!hasStorage) {
             storagePermissionLauncher.launch(storagePermission)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val hasNotif = ContextCompat.checkSelfPermission(
+                context, Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+            if (!hasNotif) notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 
@@ -145,9 +184,7 @@ fun EditProfileScreen(
             val file = createCameraImageFile(context)
             cameraImageFile = file
             val uri = FileProvider.getUriForFile(
-                context,
-                "${context.packageName}.fileprovider",
-                file
+                context, "${context.packageName}.fileprovider", file
             )
             cameraLauncher.launch(uri)
         }
@@ -167,11 +204,8 @@ fun EditProfileScreen(
         val hasCameraPermission = ContextCompat.checkSelfPermission(
             context, Manifest.permission.CAMERA
         ) == PackageManager.PERMISSION_GRANTED
-        if (hasCameraPermission) {
-            pendingCameraLaunch = true
-        } else {
-            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-        }
+        if (hasCameraPermission) pendingCameraLaunch = true
+        else cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
     }
 
     Scaffold(
@@ -257,13 +291,88 @@ fun EditProfileScreen(
                 singleLine = true
             )
 
+            Column(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = timeFieldValue,
+                    onValueChange = { tfv ->
+                        val digits = tfv.text.filter { it.isDigit() }.take(4)
+                        val formatted = if (digits.length <= 2) digits
+                                        else "${digits.take(2)}:${digits.drop(2)}"
+                        // Всегда ставим курсор в конец, чтобы он не застрял перед вставленным ":"
+                        timeFieldValue = TextFieldValue(
+                            text = formatted,
+                            selection = TextRange(formatted.length)
+                        )
+                        viewModel.updateClassTime(formatted)
+                    },
+                    label = { Text("Время любимой пары") },
+                    placeholder = { Text("ЧЧ:ММ") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    isError = uiState.classTimeError,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    trailingIcon = {
+                        IconButton(onClick = {
+                            val time = uiState.classTime
+                            if (EditProfileViewModel.isValidTimeFormat(time)) {
+                                val parts = time.split(":")
+                                timePickerHour = parts[0].toInt()
+                                timePickerMinute = parts[1].toInt()
+                            } else {
+                                val cal = Calendar.getInstance()
+                                timePickerHour = cal.get(Calendar.HOUR_OF_DAY)
+                                timePickerMinute = cal.get(Calendar.MINUTE)
+                            }
+                            showTimePicker = true
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.AccessTime,
+                                contentDescription = "Выбрать время"
+                            )
+                        }
+                    }
+                )
+                if (uiState.classTimeError) {
+                    Text(
+                        text = "Некорректный формат времени",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
+            }
+
             Button(
                 onClick = { viewModel.saveProfile(onDone) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !uiState.classTimeError
             ) {
                 Text("Готово")
             }
         }
+    }
+
+    if (showTimePicker) {
+        val timePickerState = rememberTimePickerState(
+            initialHour = timePickerHour,
+            initialMinute = timePickerMinute,
+            is24Hour = true
+        )
+        AlertDialog(
+            onDismissRequest = { showTimePicker = false },
+            text = { TimePicker(state = timePickerState) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.updateClassTime(
+                        EditProfileViewModel.formatTime(timePickerState.hour, timePickerState.minute)
+                    )
+                    showTimePicker = false
+                }) { Text("OK") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTimePicker = false }) { Text("Отмена") }
+            }
+        )
     }
 
     if (showPhotoSourceSheet) {
@@ -283,16 +392,13 @@ fun EditProfileScreen(
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-
                 OutlinedButton(
                     onClick = {
                         showPhotoSourceSheet = false
                         launchGallery()
                     },
                     modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Галерея")
-                }
+                ) { Text("Галерея") }
 
                 OutlinedButton(
                     onClick = {
@@ -300,9 +406,7 @@ fun EditProfileScreen(
                         onCameraSelected()
                     },
                     modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Камера")
-                }
+                ) { Text("Камера") }
             }
         }
     }

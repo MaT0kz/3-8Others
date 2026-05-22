@@ -26,6 +26,7 @@ class ProfileDataStore @Inject constructor(
         val AVATAR_URI_KEY = stringPreferencesKey("avatar_uri")
         val RESUME_URL_KEY = stringPreferencesKey("resume_url")
         val POSITION_KEY = stringPreferencesKey("position")
+        val CLASS_TIME_KEY = stringPreferencesKey("class_time")
     }
 
     val profile: Flow<Profile> = dataStore.data.map { prefs ->
@@ -33,7 +34,8 @@ class ProfileDataStore @Inject constructor(
             fullName = prefs[FULL_NAME_KEY] ?: "",
             avatarUri = prefs[AVATAR_URI_KEY] ?: "",
             resumeUrl = prefs[RESUME_URL_KEY] ?: "",
-            position = prefs[POSITION_KEY] ?: ""
+            position = prefs[POSITION_KEY] ?: "",
+            classTime = prefs[CLASS_TIME_KEY] ?: ""
         )
     }
 
@@ -43,6 +45,7 @@ class ProfileDataStore @Inject constructor(
             prefs[AVATAR_URI_KEY] = profile.avatarUri
             prefs[RESUME_URL_KEY] = profile.resumeUrl
             prefs[POSITION_KEY] = profile.position
+            prefs[CLASS_TIME_KEY] = profile.classTime
         }
     }
 }
